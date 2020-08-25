@@ -1,1 +1,1 @@
-Hello this is Daniel.
+Hello, this is a part of an automated CI/CD maven project.
