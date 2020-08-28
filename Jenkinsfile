@@ -18,11 +18,6 @@ pipeline {
 					archiveArtifacts artifacts: '**/*.war', fingerprint: true
 				}
 			}
-			stage ('Copy Artifacts') {
-				steps {
-					copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'sample-project'
-				}
-			}
 			stage ('Deploy') {
 				steps {
 					deploy adapters: [tomcat7(credentialsId: 'e466ad80-4c69-4bf6-896d-2b1122865f54', path: '', url: 'http://52.66.205.167:8080/')], contextPath: null, war: '**/*.war'
