@@ -9,7 +9,7 @@ pipeline {
 			stage ('Build') {
 				steps {
 					withMaven(jdk: 'JAVA_HOME', maven: 'MAVEN_HOME') {
-					cmd 'mvn clean install'
+					sh 'mvn clean install'
 					}
 				}
 			}
@@ -25,7 +25,7 @@ pipeline {
 			}
 			stage ('Deploy') {
 				steps {
-					deploy adapters: [tomcat7(credentialsId: '319d5184-50b8-4c81-93eb-98d0d9f6edab', path: '', url: 'http://localhost:9090')], contextPath: null, onFailure: false, war: '**/*.war'
+					deploy adapters: [tomcat7(credentialsId: 'e466ad80-4c69-4bf6-896d-2b1122865f54', path: '', url: 'http://52.66.205.167:8080/')], contextPath: null, war: '**/*.war'
 				}
 			}
 			
