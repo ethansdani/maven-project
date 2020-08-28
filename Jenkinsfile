@@ -13,14 +13,11 @@ pipeline {
 					}
 				}
 			}
-			stage ('Archive Artifacts') {
-				steps {
-					archiveArtifacts artifacts: '**/*.war', fingerprint: true
-				}
-			}
 			stage ('Deploy') {
 				steps {
-					deploy adapters: [tomcat7(credentialsId: 'e466ad80-4c69-4bf6-896d-2b1122865f54', path: '', url: 'http://52.66.205.167:8080/')], contextPath: null, war: '**/*.war'
+					sshagent(['4c1a1761-cc25-4f2c-abce-7d43911dcaa4']) {
+						sh 'scp webapp/target/*.war ec2-user@52.66.205.167:/usr/share/tomcat/webapps/'
+					}
 				}
 			}
 			
