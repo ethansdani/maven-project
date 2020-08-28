@@ -1,61 +1,33 @@
-pipeline
-{
-
+pipeline {
 	agent any
-	
 		stages {
-				stage ('scm checkout') {
-					steps {
-						git 'https://github.com/chaitanyapratap19/maven-project.git'
+			stage ('Fetch Source') {
+				steps {
+					git 'https://github.com/ethansdani/maven-project.git'
+				}
+			}
+			stage ('Build') {
+				steps {
+					withMaven(jdk: 'JAVA_HOME', maven: 'MAVEN_HOME') {
+					cmd 'mvn clean install'
 					}
 				}
-
-
-
-				stage ('code test') {
-				       steps {
-						withMaven(maven: 'MAVEN_HOME') {
-							sh 'mvn test'
-						}
-				       }	       
+			}
+			stage ('Archive Artifacts') {
+				steps {
+					archiveArtifacts artifacts: '**/*.war', fingerprint: true
 				}
-			
-			     stage ('code package') {
-				       steps {
-						withMaven(maven: 'MAVEN_HOME') {
-							sh 'mvn package'
-						}
-				       }	       
-			      }
-			
-			
-			    stage ('code install') {
-				       steps {
-						withMaven(maven: 'MAVEN_HOME') {
-							sh 'mvn install'
-						}
-				       }	       
+			}
+			stage ('Copy Artifacts') {
+				steps {
+					copyArtifacts filter: '**/*.war', fingerprintArtifacts: true, projectName: 'sample-project'
 				}
-			
-			
-			
-			stage ('ssh tomcat') {
-				       steps {
-						sshPublisher(publishers: [sshPublisherDesc(configName: 'Tomcat', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/var/lib/tomcat/webapps', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '**/*.war')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
-				       }	       
+			}
+			stage ('Deploy') {
+				steps {
+					deploy adapters: [tomcat7(credentialsId: '319d5184-50b8-4c81-93eb-98d0d9f6edab', path: '', url: 'http://localhost:9090')], contextPath: null, onFailure: false, war: '**/*.war'
+				}
 			}
 			
-			
-			stage ('deploy to tomcat') {
-				steps {
-						sshagent (['172.31.43.210']) {
-						sh 'scp -o StrictHostKeyChecking=no */target/*.war ec2-user@172.31.43.210:/var/lib/tomcat/webapps'
-						}
-				}
-	
-}
-				       
-	        	}				       
-
-	
+		}
 }
