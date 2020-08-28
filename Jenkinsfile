@@ -13,10 +13,16 @@ pipeline {
 					}
 				}
 			}
+			stage('Confirm Deploy to Staging') {
+				agent none
+				steps {
+				input(message: 'Deploy to Stage', ok: "Yes, let's do it!")
+				}
+			}
 			stage ('Deploy') {
 				steps {
 					sshagent(['4c1a1761-cc25-4f2c-abce-7d43911dcaa4']) {
-						sh 'scp -o StrictHostKeyChecking=no webapp/target/*.war ec2-user@52.66.205.167:/usr/share/tomcat/webapps/'
+						sh 'scp webapp/target/*.war ec2-user@52.66.205.167:/usr/share/tomcat/webapps/'
 					}
 				}
 			}
